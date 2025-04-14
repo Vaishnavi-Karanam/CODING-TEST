@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAGINATION-TASK</title>
+    <style>
+       body{
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .input-form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-form label {
+            margin-right: 5px;
+        }
+        .input-form input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            flex-grow: 1;
+        }
+        .input-form button {
+            padding: 8px 15px;
+            background-color: #007b00;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .student-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .student-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px #f0f0f0;
+        }
+        .student-card h3 {
+            margin-top: 0;
+        }
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .controls label {
+            margin-right: 5px;
+        }
+        .controls input[type="text"], .controls button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .controls button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="input-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter name">
+        <label for="age">Age:</label>
+        <input type="text" id="age" placeholder="Enter age">
+        <label for="rollno">Roll No:</label>
+        <input type="text" id="rollno" placeholder="Enter roll number">
+        <label for="marks">Marks:</label>
+        <input type="number" id="marks" placeholder="Enter marks">
+        <button onclick="addStudent()">Add Student</button>
+    </div>
+
+    <div class="controls">
+        <label for="searchName">Search by Name:</label>
+        <input type="text" id="searchName" onkeyup="searchStudents()">
+        <button onclick="filterByMarks()">Filter Marks > 75</button>
+        <button onclick="sortByMarks()">Sort by Marks (Desc)</button>
+        <button onclick="calculateAverage()">Show Average Marks</button>
+    </div>
+
+    <div class="student-cards-container" id="studentCards">
+        </div>
+
+    <script>
+        let students = [];
+        const studentCardsContainer = document.getElementById('studentCards');
+        const nameInput = document.getElementById('name');
+        const ageInput = document.getElementById('age');
+        const rollnoInput = document.getElementById('rollno');
+        const marksInput = document.getElementById('marks');
+        const searchNameInput = document.getElementById('searchName');
+
+        function displayStudents(studentList) {
+            studentCardsContainer.innerHTML = '';
+            studentList.forEach((student, index) => {
+                const card = document.createElement('div');
+                card.classList.add('student-card');
+                card.innerHTML = `
+                    <h3>${student.name}</h3>
+                    <p>Age:${student.age}</p>
+                    <p>Roll No: ${student.rollno}</p>
+                    <p>Marks: ${student.marks}</p>
+                    <button class="remove-button" onclick="removeStudent(${index})">Remove</button>
+                `;
+                studentCardsContainer.appendChild(card);
+            });
+        }
+
+        function addStudent() {
+            const name = nameInput.value.trim();
+            const age = ageInput.value.trim();
+            const rollno = rollnoInput.value.trim();
+            const marks = parseFloat(marksInput.value);
+
+            if (name && age && rollno && !isNaN(marks)) {
+                students.push({ name, age, rollno, marks });
+                displayStudents(students);
+                nameInput.value = '';
+                ageInput.value = '';
+                rollnoInput.value = '';
+                marksInput.value = '';
+            } else {
+                alert('Please enter valid student details.');
+            }
+        }
+
+        function removeStudent(index) {
+            students.splice(index, 1);
+            displayStudents(students);
+        }
+
+        function searchStudents() {
+            const searchTerm = searchNameInput.value.toLowerCase();
+            const filteredStudents = students.filter(student =>
+                student.name.toLowerCase().includes(searchTerm)
+            );
+            displayStudents(filteredStudents);
+        }
+
+        function filterByMarks() {
+            const filteredStudents = students.filter(student => student.marks > 75);
+            displayStudents(filteredStudents);
+        }
+
+        function sortByMarks() {
+            const sortedStudents = [...students].sort((a, b) => b.marks - a.marks);
+            displayStudents(sortedStudents);
+        }
+
+        function calculateAverage() {
+            if (students.length === 0) {
+                alert('No student records available.');
+                return;
+            }
+            const totalMarks = students.reduce((sum, student) => sum + student.marks, 0);
+            const averageMarks = totalMarks / students.length;
+            alert(`Average Marks: ${averageMarks.toFixed(2)}`);
+        }
+        displayStudents(students);
+    </script>
+</body>
+</html>
